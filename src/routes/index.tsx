@@ -62,25 +62,101 @@ function Nav() {
   );
 }
 
-function Hero() {
-  return (
-    <section id="home" className="relative overflow-hidden">
-      <div className="absolute inset-0 grid-bg opacity-40" />
-      <div className="absolute left-1/2 top-0 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-primary/20 blur-[120px]" />
+const ROLES = [
+  "Security Engineer",
+  "Vulnerability Analyst",
+  "Cloud Defender",
+  "Data Scientist",
+];
 
-      <div className="relative mx-auto max-w-6xl px-6 pt-20 pb-24 md:pt-32 md:pb-32">
-        <div className="grid gap-12 md:grid-cols-[1fr_auto] md:gap-16">
-          <div>
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              <Shield className="h-3 w-3 text-primary" />
-              <span>Cybersecurity · Cloud · Data Science</span>
+const THREATS = [
+  "CVE-2024-3094 patched",
+  "TLS handshake verified",
+  "Port 22 :: SSH locked",
+  "WAF rule #482 deployed",
+  "MITRE T1110 detected → blocked",
+  "Cert chain validated",
+  "Anomaly score 0.02 ✓",
+  "Zero-trust policy enforced",
+];
+
+function useTypewriter(words: string[], speed = 80, pause = 1600) {
+  const [i, setI] = useState(0);
+  const [text, setText] = useState("");
+  const [del, setDel] = useState(false);
+  useEffect(() => {
+    const word = words[i % words.length];
+    if (!del && text === word) {
+      const t = setTimeout(() => setDel(true), pause);
+      return () => clearTimeout(t);
+    }
+    if (del && text === "") {
+      setDel(false);
+      setI((v) => v + 1);
+      return;
+    }
+    const t = setTimeout(
+      () => setText(del ? word.slice(0, text.length - 1) : word.slice(0, text.length + 1)),
+      del ? speed / 2 : speed,
+    );
+    return () => clearTimeout(t);
+  }, [text, del, i, words, speed, pause]);
+  return text;
+}
+
+function Hero() {
+  const role = useTypewriter(ROLES);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const handleMove = (e: React.MouseEvent) => {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty("--mx", `${e.clientX - r.left}px`);
+    el.style.setProperty("--my", `${e.clientY - r.top}px`);
+  };
+
+  return (
+    <section id="home" ref={ref} onMouseMove={handleMove} className="relative overflow-hidden">
+      <div className="absolute inset-0 grid-bg opacity-40" />
+      <div className="absolute inset-0 spotlight" />
+      <div className="absolute left-1/2 top-0 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-primary/20 blur-[120px]" />
+      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+
+      <div className="relative mx-auto max-w-6xl px-6 pt-16 pb-20 md:pt-28 md:pb-28">
+        <div className="grid gap-12 md:grid-cols-[1.1fr_0.9fr] md:gap-16">
+          <div className="rise">
+            <div className="flex flex-wrap items-center gap-2 font-mono text-[10px]">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-signal/30 bg-signal/5 px-2.5 py-1 text-signal">
+                <span className="h-1.5 w-1.5 rounded-full bg-signal pulse-dot" />
+                CONNECTION_SECURE
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/60 px-2.5 py-1 text-muted-foreground">
+                <Shield className="h-3 w-3 text-primary" /> CYBERSEC · CLOUD · DATA SCI
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/60 px-2.5 py-1 text-muted-foreground">
+                <Fingerprint className="h-3 w-3 text-primary" /> ID: MM-0532
+              </span>
             </div>
 
-            <h1 className="text-balance font-mono text-4xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-6xl">
-              Analyzing <span className="text-primary">vulnerabilities.</span><br />
-              Securing <span className="text-primary">systems.</span><br />
-              Preventing <span className="text-primary">breaches.</span>
+            <h1 className="mt-6 text-balance font-mono text-4xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-[3.5rem]">
+              <span className="block">Analyzing <span className="text-primary">vulnerabilities.</span></span>
+              <span className="block">Securing <span className="text-primary">systems.</span></span>
+              <span className="block">
+                Preventing{" "}
+                <span className="bg-gradient-to-r from-primary via-foreground to-primary bg-clip-text text-transparent">
+                  breaches
+                </span>
+                <span className="text-primary">.</span>
+              </span>
             </h1>
+
+            <div className="mt-5 flex items-center gap-2 font-mono text-sm">
+              <span className="text-primary">{">"}</span>
+              <span className="text-muted-foreground">whoami →</span>
+              <span className="text-foreground">{role}</span>
+              <span className="inline-block h-4 w-1.5 bg-primary blink" />
+            </div>
 
             <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground">
               Computer Science &amp; Engineering student at Visvesvaraya Technological University
@@ -89,61 +165,135 @@ function Hero() {
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 font-mono">
+              <Button asChild size="lg" className="group relative overflow-hidden bg-primary text-primary-foreground hover:bg-primary/90 font-mono">
                 <a href="/resume.pdf" target="_blank" rel="noopener noreferrer">
+                  <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                   <FileDown className="h-4 w-4" /> View Resume
                 </a>
               </Button>
-              <Button asChild size="lg" variant="outline" className="border-border bg-surface/40 hover:bg-surface font-mono">
+              <Button asChild size="lg" variant="outline" className="group border-border bg-surface/40 hover:bg-surface hover:border-primary/50 font-mono">
                 <a href={LINKEDIN} target="_blank" rel="noopener noreferrer">
                   <Linkedin className="h-4 w-4" /> Connect on LinkedIn
+                  <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                 </a>
               </Button>
             </div>
 
-            <div className="mt-12 grid max-w-md grid-cols-3 gap-6 border-t border-border pt-6 font-mono">
+            <div className="mt-10 grid max-w-md grid-cols-3 gap-4 border-t border-border pt-6 font-mono">
               <Stat label="UPTIME" value="100%" />
               <Stat label="BREACHES" value="0" />
-              <Stat label="VTU '27" value="CS&E" />
+              <Stat label="GRAD" value="VTU '27" />
             </div>
           </div>
 
-          {/* Profile frame */}
-          <div className="relative mx-auto w-full max-w-xs">
-            <div className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-primary/60 via-primary/10 to-transparent blur-md" />
-            <div className="relative rounded-2xl border border-primary/30 bg-surface p-4 glow-purple">
-              <div className="mb-3 flex items-center justify-between font-mono text-[10px] text-muted-foreground">
-                <span>id_card.enc</span>
-                <span className="flex items-center gap-1 text-signal">
-                  <Lock className="h-3 w-3" /> SECURE
-                </span>
-              </div>
-              <div className="aspect-[4/5] overflow-hidden rounded-lg border border-border bg-background">
-                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/20 via-background to-background">
-                  <div className="text-center">
-                    <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full border-2 border-primary/40 bg-primary/10 font-mono text-3xl font-bold text-primary">
-                      MM
-                    </div>
-                    <p className="mt-4 font-mono text-xs text-foreground">Mohammed Musaib</p>
-                    <p className="font-mono text-[10px] text-muted-foreground">Security Engineer</p>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-2 font-mono text-[10px]">
-                <div className="rounded border border-border bg-background/60 px-2 py-1.5">
-                  <div className="text-muted-foreground">CLEARANCE</div>
-                  <div className="text-primary">LEVEL 4</div>
-                </div>
-                <div className="rounded border border-border bg-background/60 px-2 py-1.5">
-                  <div className="text-muted-foreground">STATUS</div>
-                  <div className="text-signal">ACTIVE</div>
-                </div>
-              </div>
-            </div>
+          <div className="relative mx-auto w-full max-w-sm space-y-4">
+            <RadarCard />
+            <IdCard />
+          </div>
+        </div>
+
+        <div className="relative mt-14 overflow-hidden rounded-lg border border-border bg-surface/40 py-2">
+          <div className="pointer-events-none absolute left-0 top-0 z-10 flex h-full items-center gap-2 bg-gradient-to-r from-background via-background to-transparent pl-4 pr-8 font-mono text-[10px] uppercase tracking-wider text-signal">
+            <Zap className="h-3 w-3" /> live_feed
+          </div>
+          <div className="flex w-max ticker font-mono text-xs text-muted-foreground">
+            {[...THREATS, ...THREATS].map((t, i) => (
+              <span key={i} className="flex items-center gap-2 px-6">
+                <span className="h-1 w-1 rounded-full bg-primary" /> {t}
+              </span>
+            ))}
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+function RadarCard() {
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-border bg-surface/60 p-5 backdrop-blur-sm">
+      <div className="flex items-center justify-between font-mono text-[10px] text-muted-foreground">
+        <span className="flex items-center gap-1.5">
+          <Radar className="h-3 w-3 text-primary" /> threat_radar.sh
+        </span>
+        <span className="flex items-center gap-1 text-signal">
+          <span className="h-1.5 w-1.5 rounded-full bg-signal pulse-dot" /> SCANNING
+        </span>
+      </div>
+
+      <div className="relative mx-auto mt-4 aspect-square w-full max-w-[220px]">
+        {[25, 50, 75, 100].map((n) => (
+          <div
+            key={n}
+            className="absolute inset-0 m-auto rounded-full border border-primary/20"
+            style={{ width: `${n}%`, height: `${n}%` }}
+          />
+        ))}
+        <div className="absolute inset-x-0 top-1/2 h-px bg-primary/15" />
+        <div className="absolute inset-y-0 left-1/2 w-px bg-primary/15" />
+        <div className="absolute inset-0 orbit">
+          <div
+            className="absolute left-1/2 top-1/2 h-1/2 w-1/2 origin-top-left"
+            style={{
+              background:
+                "conic-gradient(from 0deg, color-mix(in oklab, var(--primary) 55%, transparent), transparent 70deg)",
+              clipPath: "polygon(0 0, 100% 0, 0 100%)",
+            }}
+          />
+        </div>
+        <span className="absolute left-[28%] top-[35%] h-1.5 w-1.5 rounded-full bg-signal shadow-[0_0_8px] shadow-signal" />
+        <span className="absolute left-[68%] top-[58%] h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_10px] shadow-primary" />
+        <span className="absolute left-[44%] top-[72%] h-1 w-1 rounded-full bg-signal" />
+        <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary shadow-[0_0_16px] shadow-primary" />
+      </div>
+
+      <div className="mt-4 grid grid-cols-3 gap-2 font-mono text-[10px]">
+        <RadarStat label="NODES" value="128" />
+        <RadarStat label="ALERTS" value="0" tone="signal" />
+        <RadarStat label="LATENCY" value="12ms" />
+      </div>
+    </div>
+  );
+}
+
+function RadarStat({ label, value, tone }: { label: string; value: string; tone?: "signal" }) {
+  return (
+    <div className="rounded border border-border bg-background/60 px-2 py-1.5">
+      <div className="text-muted-foreground">{label}</div>
+      <div className={tone === "signal" ? "text-signal" : "text-primary"}>{value}</div>
+    </div>
+  );
+}
+
+function IdCard() {
+  return (
+    <div className="relative float-y">
+      <div className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-primary/60 via-primary/10 to-transparent blur-md" />
+      <div className="relative scanline overflow-hidden rounded-2xl border border-primary/30 bg-surface p-4 glow-purple">
+        <div className="mb-3 flex items-center justify-between font-mono text-[10px] text-muted-foreground">
+          <span className="flex items-center gap-1.5">
+            <Eye className="h-3 w-3 text-primary" /> id_card.enc
+          </span>
+          <span className="flex items-center gap-1 text-signal">
+            <Lock className="h-3 w-3" /> AES-256
+          </span>
+        </div>
+        <div className="relative aspect-[16/9] overflow-hidden rounded-lg border border-border bg-background">
+          <div className="absolute inset-0 noise opacity-60" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/25 via-background to-background" />
+          <div className="relative flex h-full items-center gap-4 px-5">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-primary/50 bg-primary/10 font-mono text-xl font-bold text-primary">
+              MM
+            </div>
+            <div className="font-mono">
+              <p className="text-sm text-foreground">Mohammed Musaib</p>
+              <p className="text-[10px] text-muted-foreground">CS&amp;E · VTU · 2027</p>
+              <p className="mt-1 text-[10px] text-primary">CLEARANCE LVL_04</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
