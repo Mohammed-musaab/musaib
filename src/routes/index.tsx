@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ContactDialog } from "@/components/ContactDialog";
 import {
   Github, Linkedin, FileDown, Mail, Phone, Terminal, Shield, Cloud, Database,
-  Network, Lock, ArrowUpRight, ChevronRight, Cpu, Activity,
+  Network, Lock, ArrowUpRight, ChevronRight, Cpu, Activity, Radar, Zap, Eye, Fingerprint,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
