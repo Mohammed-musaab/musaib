@@ -19,8 +19,8 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const LINKEDIN = "https://www.linkedin.com/in/mohammed-musaib";
-const GITHUB = "https://github.com/mohammedmusaib";
+const LINKEDIN = "https://www.linkedin.com/in/mohammed-musab/";
+const GITHUB = "https://github.com/Mohammed-musaab";
 const EMAIL = "Mohammedmusaib532005@gmail.com";
 
 function Nav() {
@@ -166,7 +166,7 @@ function Hero() {
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button asChild size="lg" className="group relative overflow-hidden bg-primary text-primary-foreground hover:bg-primary/90 font-mono">
-                <a href="/resume.pdf" target="_blank" rel="noopener noreferrer">
+                <a href="https://drive.google.com/file/d/19OQa5LRFmItT2VH3jRfodobMz1t0GS89/view?usp=drive_link" target="_blank" rel="noopener noreferrer">
                   <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                   <FileDown className="h-4 w-4" /> View Resume
                 </a>
